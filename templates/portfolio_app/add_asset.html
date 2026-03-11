@@ -1,0 +1,21 @@
+{% extends "portfolio_app/base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2>Додати актив у "{{ portfolio.name }}"</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 20px; line-height: 1.6;">
+            {{ form.as_p }}
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary">Додати актив</button>
+            <a href="{% url 'dashboard' %}" class="btn" style="background-color: #ebecf0; color: #172b4d;">Повернутися</a>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

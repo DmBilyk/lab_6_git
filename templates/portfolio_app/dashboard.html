@@ -1,0 +1,109 @@
+{% extends "portfolio_app/base.html" %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <h1>Мої портфелі</h1>
+    <a href="{% url 'create_portfolio' %}" class="btn btn-primary btn-sm">+ Новий портфель</a>
+</div>
+
+{% if not portfolio_data %}
+    <div class="card">
+        <p class="empty-note">Портфелів ще немає. <a href="{% url 'create_portfolio' %}">Створіть перший</a>.</p>
+    </div>
+{% endif %}
+
+{% for item in portfolio_data %}
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:8px;">
+        <h2>{{ item.portfolio.name }}</h2>
+        <a href="{% url 'add_asset' item.portfolio.id %}" class="btn btn-primary btn-sm">+ Додати актив</a>
+    </div>
+
+    {% if item.assets %}
+    <div class="portfolio-grid">
+
+        <!-- Таблиця активів з вагами -->
+        <div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Тікер</th>
+                            <th>К-сть</th>
+                            <th>Ціна</th>
+                            <th>Вартість</th>
+                            <th>Частка</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in item.assets %}
+                        <tr>
+                            <td><span class="tag">{{ asset.ticker }}</span></td>
+                            <td>{{ asset.quantity }}</td>
+                            <td>${{ asset.price|floatformat:2 }}</td>
+                            <td>${{ asset.value|floatformat:2 }}</td>
+                            <td class="weight-badge">{{ asset.weight }}%</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="total-row">
+                            <td colspan="3">Загальна вартість</td>
+                            <td>${{ item.total|floatformat:2 }}</td>
+                            <td>100%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Task 3.2.2: Pie Chart -->
+        <div>
+            <h3 style="font-size:14px; color:#666; text-align:center; margin-bottom:12px;">Розподіл активів</h3>
+            <div class="chart-container">
+                <canvas id="chart-{{ item.portfolio.id }}"></canvas>
+            </div>
+            <script>
+                (function() {
+                    const data = {{ item.chart_data|safe }};
+                    const COLORS = [
+                        "#4361ee","#f72585","#4cc9f0","#7209b7",
+                        "#3a0ca3","#f3722c","#90be6d","#43aa8b",
+                        "#577590","#f9c74f"
+                    ];
+                    const ctx = document.getElementById("chart-{{ item.portfolio.id }}").getContext("2d");
+                    new Chart(ctx, {
+                        type: "pie",
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                data: data.values,
+                                backgroundColor: COLORS.slice(0, data.labels.length),
+                                borderWidth: 2,
+                                borderColor: "#fff",
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: "bottom",
+                                    labels: { font: { size: 12 }, padding: 10 }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed.toFixed(1)}%`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })();
+            </script>
+        </div>
+
+    </div>
+    {% else %}
+        <p class="empty-note">Активів ще немає. Додайте перший актив.</p>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

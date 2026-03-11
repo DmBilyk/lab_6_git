@@ -1,0 +1,20 @@
+{% extends "portfolio_app/base.html" %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2>Створити новий портфель</h2>
+
+    <form method="POST" action="{% url 'create_portfolio' %}">
+        {% csrf_token %}
+        <div style="margin-bottom: 16px;">
+            <label for="name" style="display: block; margin-bottom: 8px; font-weight: 500;">Назва портфеля:</label>
+            <input type="text" id="name" name="name" required style="width: 100%; padding: 8px; border: 1px solid #dfe1e6; border-radius: 4px; box-sizing: border-box;" placeholder="Наприклад: Технологічні акції">
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary">Зберегти</button>
+            <a href="{% url 'dashboard' %}" class="btn" style="background-color: #ebecf0; color: #172b4d;">Скасувати</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
